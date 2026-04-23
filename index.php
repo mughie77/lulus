@@ -62,7 +62,7 @@ $waktu_buka = $settings['tgl_pengumuman'];
     <!-- Header -->
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
+            <a href="index.php" class="flex items-center space-x-4 hover:opacity-80 transition-opacity">
                 <div class="p-2 bg-indigo-50 rounded-2xl">
                     <img src="uploads/logo/<?php echo $settings['logo']; ?>" alt="Logo" class="h-10 w-10 object-contain">
                 </div>
@@ -70,7 +70,7 @@ $waktu_buka = $settings['tgl_pengumuman'];
                     <h1 class="text-lg font-black text-slate-800 uppercase tracking-tighter leading-none"><?php echo $settings['nama_sekolah']; ?></h1>
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1"><?php echo $settings['alamat_sekolah']; ?></p>
                 </div>
-            </div>
+            </a>
             <a href="admin/login.php" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-indigo-600 hover:text-white transition-all duration-300">
                 <i class="fas fa-shield-alt"></i>
             </a>
@@ -116,7 +116,9 @@ $waktu_buka = $settings['tgl_pengumuman'];
             <!-- Search Section -->
             <div id="searchSection" class="hidden glass-card rounded-[2rem] md:rounded-[3rem] shadow-2xl overflow-hidden p-6 md:p-12 animate-in fade-in slide-in-from-bottom-10 duration-700 w-full">
                 <div class="text-center mb-8 md:mb-10">
-                    <h2 class="text-3xl md:text-4xl font-black text-slate-800 mb-4 tracking-tighter">Cek Hasil Kelulusan</h2>
+                    <a href="index.php" class="inline-block hover:opacity-80 transition-opacity">
+                        <h2 class="text-3xl md:text-4xl font-black text-slate-800 mb-4 tracking-tighter">Cek Hasil Kelulusan</h2>
+                    </a>
                     <p class="text-slate-500 font-medium text-sm md:text-base max-w-md mx-auto">Masukkan NISN atau Nama Anda untuk melihat status kelulusan.</p>
                 </div>
 
