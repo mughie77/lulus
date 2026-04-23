@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($file_ext === 'png') {
             $new_name = 'logo_' . time() . '.png';
             if (move_uploaded_file($file_tmp, '../uploads/logo/' . $new_name)) {
-                // Delete old logo if it's not the default
                 if ($settings['logo'] !== 'default-logo.png' && file_exists('../uploads/logo/' . $settings['logo'])) {
                     unlink('../uploads/logo/' . $settings['logo']);
                 }
@@ -32,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE pengaturan SET nama_sekolah = ?, alamat_sekolah = ?, logo = ?, tgl_pengumuman = ? WHERE id = ?");
         $stmt->execute([$nama_sekolah, $alamat_sekolah, $logo_name, $tgl_pengumuman, $settings['id']]);
         $message = "Pengaturan berhasil diperbarui!";
-        $settings = getSettings($pdo); // Refresh settings
+        $settings = getSettings($pdo);
     }
 }
 ?>
@@ -44,60 +43,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Pengaturan - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <nav class="bg-indigo-700 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-xl font-bold">Admin Panel</span>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="index.php" class="hover:bg-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Siswa</a>
-                    <a href="pengaturan.php" class="bg-indigo-800 px-3 py-2 rounded-md text-sm font-medium">Pengaturan</a>
-                    <a href="logout.php" class="hover:bg-red-600 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
-                </div>
-            </div>
+<body class="bg-slate-50 min-h-screen flex">
+
+    <?php include 'components/sidebar.php'; ?>
+
+    <main class="flex-1 md:ml-64 p-4 md:p-10 pt-20 md:pt-10">
+        <div class="mb-10">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Pengaturan Sekolah</h1>
+            <p class="text-slate-500 mt-1 font-medium">Konfigurasi identitas sekolah dan waktu pengumuman.</p>
         </div>
-    </nav>
 
-    <main class="max-w-4xl mx-auto py-10 px-4">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Pengaturan Umum</h2>
-
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden p-8">
             <?php if ($message): ?>
-            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
-                <p><?php echo $message; ?></p>
-            </div>
+                <script>
+                    Swal.fire('Berhasil!', '<?php echo $message; ?>', 'success');
+                </script>
             <?php endif; ?>
 
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form method="POST" enctype="multipart/form-data" class="space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Nama Sekolah</label>
-                        <input type="text" name="nama_sekolah" value="<?php echo htmlspecialchars($settings['nama_sekolah']); ?>" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Nama Sekolah</label>
+                        <input type="text" name="nama_sekolah" value="<?php echo htmlspecialchars($settings['nama_sekolah']); ?>" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" required>
                     </div>
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Waktu Pengumuman Buka</label>
-                        <input type="datetime-local" name="tgl_pengumuman" value="<?php echo date('Y-m-d\TH:i', strtotime($settings['tgl_pengumuman'])); ?>" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Waktu Pengumuman Buka</label>
+                        <input type="datetime-local" name="tgl_pengumuman" value="<?php echo date('Y-m-d\TH:i', strtotime($settings['tgl_pengumuman'])); ?>" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" required>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Alamat Sekolah</label>
-                    <textarea name="alamat_sekolah" rows="3" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required><?php echo htmlspecialchars($settings['alamat_sekolah']); ?></textarea>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Alamat Sekolah</label>
+                    <textarea name="alamat_sekolah" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" required><?php echo htmlspecialchars($settings['alamat_sekolah']); ?></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Logo Sekolah (.png)</label>
-                    <div class="flex items-center space-x-4">
-                        <img src="../uploads/logo/<?php echo $settings['logo']; ?>" alt="Logo" class="h-20 w-20 object-contain border p-1 rounded">
-                        <input type="file" name="logo" accept="image/png" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Logo Sekolah (.png)</label>
+                    <div class="flex items-center space-x-6 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                        <img src="../uploads/logo/<?php echo $settings['logo']; ?>" alt="Logo" class="h-24 w-24 object-contain bg-white p-2 rounded-xl shadow-sm">
+                        <div class="flex-1">
+                            <input type="file" name="logo" accept="image/png" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+                            <p class="text-xs text-slate-400 mt-2">Format PNG, ukuran maksimal 2MB disarankan.</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-2xl shadow-lg shadow-indigo-200 transition-all">
                         Simpan Perubahan
                     </button>
                 </div>

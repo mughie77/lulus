@@ -12,109 +12,101 @@ $settings = getSettings($pdo);
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <nav class="bg-indigo-700 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-xl font-bold">Admin Panel</span>
-                </div>
-                <div class="flex space-x-4">
-                    <a href="index.php" class="bg-indigo-800 px-3 py-2 rounded-md text-sm font-medium">Siswa</a>
-                    <a href="pengaturan.php" class="hover:bg-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Pengaturan</a>
-                    <a href="logout.php" class="hover:bg-red-600 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="bg-slate-50 min-h-screen flex">
 
-    <main class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-            <h1 class="text-3xl font-bold text-gray-800">Manajemen Data Siswa</h1>
-            <div class="flex flex-wrap gap-2">
-                <button onclick="openModal('add')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition">
+    <?php include 'components/sidebar.php'; ?>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 md:ml-64 p-4 md:p-10 pt-20 md:pt-10">
+        <div class="mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Manajemen Siswa</h1>
+                <p class="text-slate-500 mt-1 font-medium">Kelola data kelulusan siswa dengan mudah dan cepat.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="openModal('add')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl shadow-lg shadow-indigo-200 transition-all font-bold flex items-center">
                     <i class="fas fa-plus mr-2"></i> Tambah Siswa
                 </button>
-                <button onclick="openModal('import')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow transition">
+                <button onclick="openModal('import')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 transition-all font-bold flex items-center">
                     <i class="fas fa-file-excel mr-2"></i> Import Excel
                 </button>
             </div>
         </div>
 
         <!-- Table Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full divide-y divide-slate-100">
+                    <thead class="bg-slate-50/50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NISN</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link SKL</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">No</th>
+                            <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">NISN</th>
+                            <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Nama</th>
+                            <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                            <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Link SKL</th>
+                            <th class="px-8 py-5 text-center text-xs font-bold text-slate-500 uppercase tracking-widest">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="studentTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Data will be loaded here via AJAX -->
+                    <tbody id="studentTableBody" class="divide-y divide-slate-100">
+                        <!-- Data loaded via AJAX -->
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <!-- Modal Form (Add/Edit) -->
-    <div id="studentModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Tambah Siswa</h3>
-                <form id="studentForm" class="mt-4 space-y-4">
-                    <input type="hidden" id="studentId" name="id">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">NISN</label>
-                        <input type="text" name="nisn" id="formNisn" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <input type="text" name="nama" id="formNama" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status" id="formStatus" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="LULUS">LULUS</option>
-                            <option value="TIDAK LULUS">TIDAK LULUS</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Link Google Drive SKL</label>
-                        <input type="url" name="link_skl" id="formLink" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500" required>
-                    </div>
-                    <div class="flex justify-end space-x-2 pt-4">
-                        <button type="button" onclick="closeModal('studentModal')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
-                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Simpan</button>
-                    </div>
-                </form>
-            </div>
+    <!-- Modal forms remains largely the same but updated style -->
+    <!-- (Modal content follows...) -->
+    <div id="studentModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+        <div class="relative mx-auto p-8 w-full max-w-md shadow-2xl rounded-3xl bg-white animate-in fade-in zoom-in duration-300">
+            <h3 class="text-2xl font-bold text-slate-800 mb-6" id="modalTitle">Tambah Siswa</h3>
+            <form id="studentForm" class="space-y-5">
+                <input type="hidden" id="studentId" name="id">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">NISN</label>
+                    <input type="text" name="nisn" id="formNisn" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Nama Lengkap</label>
+                    <input type="text" name="nama" id="formNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Status</label>
+                    <select name="status" id="formStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <option value="LULUS">LULUS</option>
+                        <option value="TIDAK LULUS">TIDAK LULUS</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Link Google Drive SKL</label>
+                    <input type="url" name="link_skl" id="formLink" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" required>
+                </div>
+                <div class="flex justify-end space-x-3 pt-6">
+                    <button type="button" onclick="closeModal('studentModal')" class="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Modal Import -->
-    <div id="importModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Import Data Excel</h3>
-                <p class="text-xs text-gray-500 mt-1">Format: NISN, Nama, Link SKL, Status (LULUS/TIDAK LULUS)</p>
-                <form id="importForm" class="mt-4 space-y-4" enctype="multipart/form-data">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Pilih File .xlsx</label>
-                        <input type="file" name="file_excel" accept=".xlsx" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
-                    </div>
-                    <div class="flex justify-end space-x-2 pt-4">
-                        <button type="button" onclick="closeModal('importModal')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Batal</button>
-                        <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700">Import</button>
-                    </div>
-                </form>
-            </div>
+    <!-- Import Modal -->
+    <div id="importModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+        <div class="relative mx-auto p-8 w-full max-w-md shadow-2xl rounded-3xl bg-white animate-in fade-in zoom-in duration-300">
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Import Data Excel</h3>
+            <p class="text-sm text-slate-500 mb-6">Pastikan urutan kolom: NISN, Nama, Link SKL, Status</p>
+            <form id="importForm" class="space-y-5" enctype="multipart/form-data">
+                <div class="border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center hover:border-indigo-300 transition-colors">
+                    <input type="file" name="file_excel" accept=".xlsx" class="hidden" id="excelInput" required>
+                    <label for="excelInput" class="cursor-pointer">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-slate-300 mb-4"></i>
+                        <p class="text-slate-600 font-medium">Klik untuk pilih file .xlsx</p>
+                    </label>
+                </div>
+                <div class="flex justify-end space-x-3 pt-6">
+                    <button type="button" onclick="closeModal('importModal')" class="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" class="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-100 transition">Import</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -128,21 +120,23 @@ $settings = getSettings($pdo);
             tbody.innerHTML = '';
             data.forEach((s, i) => {
                 tbody.innerHTML += `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${i + 1}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${s.nisn}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.nama}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${s.status === 'LULUS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-8 py-5 text-sm font-medium text-slate-400">${i + 1}</td>
+                        <td class="px-8 py-5 text-sm font-bold text-slate-900">${s.nisn}</td>
+                        <td class="px-8 py-5 text-sm font-semibold text-slate-700">${s.nama}</td>
+                        <td class="px-8 py-5 text-sm">
+                            <span class="px-4 py-1 inline-flex text-xs font-bold leading-5 rounded-full ${s.status === 'LULUS' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
                                 ${s.status}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
-                            <a href="${s.link_skl}" target="_blank" class="hover:underline">Buka Link</a>
+                        <td class="px-8 py-5 text-sm">
+                            <a href="${s.link_skl}" target="_blank" class="text-indigo-600 hover:text-indigo-900 font-bold flex items-center">
+                                <i class="fas fa-external-link-alt mr-2"></i> Link
+                            </a>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick='editStudent(${JSON.stringify(s)})' class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteStudent(${s.id})" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                        <td class="px-8 py-5 text-sm text-center">
+                            <button onclick='editStudent(${JSON.stringify(s)})' class="text-slate-400 hover:text-indigo-600 p-2 transition-colors"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteStudent(${s.id})" class="text-slate-400 hover:text-red-600 p-2 transition-colors"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -217,8 +211,8 @@ $settings = getSettings($pdo);
                 text: "Data yang dihapus tidak bisa dikembalikan!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
                 confirmButtonText: 'Ya, Hapus!'
             });
 
