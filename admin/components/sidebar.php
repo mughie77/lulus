@@ -10,19 +10,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </div>
         <ul class="space-y-2 font-medium">
             <li>
-                <a href="index.php" class="flex items-center p-3 rounded-xl hover:bg-indigo-800 transition-all <?php echo $current_page == 'index.php' ? 'bg-indigo-700' : ''; ?>">
+                <a href="index" class="flex items-center p-3 rounded-xl hover:bg-indigo-800 transition-all <?php echo $current_page == 'index.php' ? 'bg-indigo-700' : ''; ?>">
                     <i class="fas fa-users w-6"></i>
                     <span class="ms-3">Data Siswa</span>
                 </a>
             </li>
             <li>
-                <a href="pengaturan.php" class="flex items-center p-3 rounded-xl hover:bg-indigo-800 transition-all <?php echo $current_page == 'pengaturan.php' ? 'bg-indigo-700' : ''; ?>">
+                <a href="pengaturan" class="flex items-center p-3 rounded-xl hover:bg-indigo-800 transition-all <?php echo $current_page == 'pengaturan.php' ? 'bg-indigo-700' : ''; ?>">
                     <i class="fas fa-cog w-6"></i>
                     <span class="ms-3">Pengaturan</span>
                 </a>
             </li>
             <li class="pt-10">
-                <a href="logout.php" class="flex items-center p-3 rounded-xl text-red-300 hover:bg-red-900 hover:text-white transition-all">
+                <a href="logout" class="flex items-center p-3 rounded-xl text-red-300 hover:bg-red-900 hover:text-white transition-all">
                     <i class="fas fa-sign-out-alt w-6"></i>
                     <span class="ms-3">Keluar</span>
                 </a>

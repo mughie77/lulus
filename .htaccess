@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# 1. Redirect /nama-file.php ke /nama-file (untuk membersihkan URL jika user mengetik .php)
+RewriteCond %{THE_REQUEST} /([^/.]+)\.php [NC]
+RewriteRule ^ %1 [L,R=301]
+
+# 2. Cari file .php jika request tidak memiliki ekstensi
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]

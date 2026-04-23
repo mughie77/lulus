@@ -124,7 +124,7 @@ $settings = getSettings($pdo);
         <div class="relative mx-auto p-8 w-full max-w-md shadow-2xl rounded-3xl bg-white animate-in fade-in zoom-in duration-300">
             <h3 class="text-2xl font-bold text-slate-800 mb-2">Import Data Excel</h3>
             <p class="text-sm text-slate-500 mb-4">Pastikan urutan kolom: NISN, Nama, Link SKL, Status</p>
-            <a href="proses.php?action=download_template" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold flex items-center mb-6">
+            <a href="proses?action=download_template" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold flex items-center mb-6">
                 <i class="fas fa-file-download mr-2"></i> Download Template Excel
             </a>
             <form id="importForm" class="space-y-5" enctype="multipart/form-data">
@@ -150,7 +150,7 @@ $settings = getSettings($pdo);
         let currentLimit = 10;
 
         async function fetchStudents() {
-            const res = await fetch(`proses.php?action=fetch&page=${currentPage}&search=${currentSearch}&limit=${currentLimit}`);
+            const res = await fetch(`proses?action=fetch&page=${currentPage}&search=${currentSearch}&limit=${currentLimit}`);
             const result = await res.json();
             const tbody = document.getElementById('studentTableBody');
             const data = result.data;
@@ -284,7 +284,7 @@ $settings = getSettings($pdo);
                 const formData = new FormData();
                 ids.forEach(id => formData.append('ids[]', id));
 
-                const res = await fetch('proses.php?action=delete_selected', {
+                const res = await fetch('proses?action=delete_selected', {
                     method: 'POST',
                     body: formData
                 });
@@ -327,7 +327,7 @@ $settings = getSettings($pdo);
             e.preventDefault();
             const formData = new FormData(e.target);
             const action = currentMode === 'add' ? 'add' : 'update';
-            const res = await fetch('proses.php?action=' + action, {
+            const res = await fetch('proses?action=' + action, {
                 method: 'POST',
                 body: formData
             });
@@ -344,7 +344,7 @@ $settings = getSettings($pdo);
         document.getElementById('importForm').onsubmit = async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const res = await fetch('proses.php?action=import', {
+            const res = await fetch('proses?action=import', {
                 method: 'POST',
                 body: formData
             });
@@ -372,7 +372,7 @@ $settings = getSettings($pdo);
             if (confirm.isConfirmed) {
                 const formData = new FormData();
                 formData.append('id', id);
-                const res = await fetch('proses.php?action=delete', {
+                const res = await fetch('proses?action=delete', {
                     method: 'POST',
                     body: formData
                 });

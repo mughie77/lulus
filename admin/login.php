@@ -2,7 +2,7 @@
 require_once '../config.php';
 
 if (isset($_SESSION['admin'])) {
-    header("Location: index.php");
+    header("Location: index");
     exit;
 }
 
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($admin && password_verify($password, $admin['password'])) {
         $_SESSION['admin'] = $admin['id'];
-        header("Location: index.php");
+        header("Location: index");
         exit;
     } else {
         $error = "Username atau Password salah!";
@@ -81,7 +81,7 @@ $settings = getSettings($pdo);
             </div>
         </form>
         <div class="mt-6 text-center">
-            <a href="../index.php" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+            <a href="../index" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali ke Beranda
             </a>
         </div>
