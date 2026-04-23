@@ -123,7 +123,10 @@ $settings = getSettings($pdo);
     <div id="importModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
         <div class="relative mx-auto p-8 w-full max-w-md shadow-2xl rounded-3xl bg-white animate-in fade-in zoom-in duration-300">
             <h3 class="text-2xl font-bold text-slate-800 mb-2">Import Data Excel</h3>
-            <p class="text-sm text-slate-500 mb-6">Pastikan urutan kolom: NISN, Nama, Link SKL, Status</p>
+            <p class="text-sm text-slate-500 mb-4">Pastikan urutan kolom: NISN, Nama, Link SKL, Status</p>
+            <a href="proses.php?action=download_template" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold flex items-center mb-6">
+                <i class="fas fa-file-download mr-2"></i> Download Template Excel
+            </a>
             <form id="importForm" class="space-y-5" enctype="multipart/form-data">
                 <div class="border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center hover:border-indigo-300 transition-colors">
                     <input type="file" name="file_excel" accept=".xlsx" class="hidden" id="excelInput" required>

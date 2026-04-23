@@ -45,8 +45,13 @@ $waktu_buka = $settings['tgl_pengumuman'];
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        :root {
+            --color-primary: #4f46e5;
+            --color-secondary: #7c3aed;
+            --color-accent: #2563eb;
+        }
         .bg-dynamic {
-            background: linear-gradient(-45deg, #4f46e5, #7c3aed, #2563eb, #0891b2);
+            background: linear-gradient(-45deg, var(--color-primary), var(--color-secondary), var(--color-accent));
             background-size: 400% 400%;
             animation: gradient-animate 15s ease infinite;
         }
@@ -162,6 +167,9 @@ $waktu_buka = $settings['tgl_pengumuman'];
         </div>
     </main>
 
+    <!-- Logo for color extraction -->
+    <img id="logoSource" src="uploads/logo/<?php echo $settings['logo']; ?>" class="hidden">
+
     <footer class="py-10 bg-white text-center">
         <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">&copy; <?php echo date('Y'); ?> <?php echo $settings['nama_sekolah']; ?></p>
         <div class="mt-4 flex justify-center space-x-6 text-slate-300">
@@ -172,6 +180,51 @@ $waktu_buka = $settings['tgl_pengumuman'];
     </footer>
 
     <script>
+        // Dominant Color Extraction
+        function extractColors() {
+            const img = document.getElementById('logoSource');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                try {
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                    let r = 0, g = 0, b = 0, count = 0;
+
+                    for (let i = 0; i < imageData.length; i += 4) {
+                        if (imageData[i+3] < 128) continue; // Skip transparent
+                        r += imageData[i];
+                        g += imageData[i+1];
+                        b += imageData[i+2];
+                        count++;
+                    }
+
+                    if (count > 0) {
+                        r = Math.floor(r / count);
+                        g = Math.floor(g / count);
+                        b = Math.floor(b / count);
+
+                        const primary = `rgb(${r}, ${g}, ${b})`;
+                        const secondary = `rgb(${Math.max(0, r-40)}, ${Math.max(0, g-40)}, ${Math.max(0, b-40)})`;
+                        const accent = `rgb(${Math.min(255, r+40)}, ${Math.min(255, g+40)}, ${Math.min(255, b+40)})`;
+
+                        document.documentElement.style.setProperty('--color-primary', primary);
+                        document.documentElement.style.setProperty('--color-secondary', secondary);
+                        document.documentElement.style.setProperty('--color-accent', accent);
+                    }
+                } catch (e) {
+                    console.log("Cross-origin or canvas error", e);
+                }
+            };
+
+            if (img.complete) img.onload();
+        }
+        extractColors();
+
         const targetDate = new Date("<?php echo $waktu_buka; ?>").getTime();
 
         function updateCountdown() {

@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../lib/SimpleXLSX.php';
+require_once __DIR__ . '/../lib/SimpleXLSXGen.php';
 
 use Shuchkin\SimpleXLSX;
+use Shuchkin\SimpleXLSXGen;
 
 if (!isset($_SESSION['admin'])) {
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
@@ -105,6 +107,16 @@ elseif ($action === 'delete_selected') {
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
     }
+}
+
+elseif ($action === 'download_template') {
+    $data = [
+        ['NISN', 'Nama', 'Link SKL', 'Status (LULUS/TIDAK LULUS)'],
+        ['0012345678', 'Ahmad Siswa', 'https://drive.google.com/file/d/xxx/view', 'LULUS'],
+        ['0087654321', 'Budi Pelajar', 'https://drive.google.com/file/d/yyy/view', 'TIDAK LULUS']
+    ];
+    SimpleXLSXGen::fromArray($data)->downloadAs('Template_Import_Siswa.xlsx');
+    exit;
 }
 
 elseif ($action === 'import') {
