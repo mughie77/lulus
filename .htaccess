@@ -1,10 +1,22 @@
-RewriteEngine On
+<IfModule mod_rewrite.c>
+    # Matikan MultiViews agar tidak bentrok dengan RewriteRule
+    Options -MultiViews
 
-# 1. Redirect /nama-file.php ke /nama-file (untuk membersihkan URL jika user mengetik .php)
-RewriteCond %{THE_REQUEST} /([^/.]+)\.php [NC]
-RewriteRule ^ %1 [L,R=301]
+    RewriteEngine On
 
-# 2. Cari file .php jika request tidak memiliki ekstensi
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.*)$ $1.php [L]
+    # 1. Redirect /file.php ke /file (untuk kebersihan URL)
+    # Gunakan %{ENV:REDIRECT_STATUS} untuk mencegah loop
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteCond %{REQUEST_FILENAME} \.php$ [NC]
+    RewriteRule ^(.*)\.php$ $1 [R=301,L]
+
+    # 2. Map /file ke /file.php jika filenya ada
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}\.php -f
+    RewriteRule ^(.*)$ $1.php [L]
+
+    # 3. Pastikan folder admin/ tetap bisa mengakses index.php
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteCond %{REQUEST_FILENAME}/index.php -f
+    RewriteRule ^(.*)$ $1/index.php [L]
+</IfModule>
