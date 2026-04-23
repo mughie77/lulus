@@ -12,9 +12,35 @@ if (!isset($_SESSION['admin'])) {
 $action = $_GET['action'] ?? '';
 
 if ($action === 'fetch') {
-    $stmt = $pdo->query("SELECT * FROM siswa ORDER BY id DESC");
+    $search = $_GET['search'] ?? '';
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+    $offset = ($page - 1) * $limit;
+
+    $where = "";
+    $params = [];
+    if (!empty($search)) {
+        $where = "WHERE nama LIKE ? OR nisn LIKE ?";
+        $params = ["%$search%", "%$search%"];
+    }
+
+    // Get total rows
+    $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM siswa $where");
+    $count_stmt->execute($params);
+    $total_rows = $count_stmt->fetchColumn();
+    $total_pages = ceil($total_rows / $limit);
+
+    // Get data
+    $stmt = $pdo->prepare("SELECT * FROM siswa $where ORDER BY id DESC LIMIT $limit OFFSET $offset");
+    $stmt->execute($params);
     $data = $stmt->fetchAll();
-    echo json_encode($data);
+
+    echo json_encode([
+        'data' => $data,
+        'total_pages' => $total_pages,
+        'current_page' => $page,
+        'total_rows' => $total_rows
+    ]);
 }
 
 elseif ($action === 'add') {

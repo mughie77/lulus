@@ -5,16 +5,30 @@ $output = '';
 $git_url = "https://github.com/mughie77/lulus.git";
 
 if (isset($_POST['update'])) {
-    // Check if git is initialized
+    // Comprehensive Git Update Command
+    // 1. Navigate to root
+    // 2. Initialize if needed
+    // 3. Set/Update remote
+    // 4. Clean local changes that might block reset
+    // 5. Fetch and Reset
+    $cmd = "cd .. && ";
     if (!is_dir('../.git')) {
-        $cmd = "cd .. && git init && git remote add origin $git_url && git fetch --all && (git reset --hard origin/main || git reset --hard origin/master) 2>&1";
+        $cmd .= "git init && git remote add origin $git_url && ";
     } else {
-        $cmd = "cd .. && git remote set-url origin $git_url && git fetch --all && (git reset --hard origin/main || git reset --hard origin/master) 2>&1";
+        $cmd .= "git remote set-url origin $git_url && ";
     }
-    $git_output = shell_exec($cmd);
-    $_SESSION['git_output'] = $git_output;
+    $cmd .= "git fetch --all && git clean -fd && (git reset --hard origin/main || git reset --hard origin/master) 2>&1";
 
-    header("Location: system_update.php?updated=true");
+    $git_output = shell_exec($cmd);
+
+    // Check if update was actually successful
+    if (strpos($git_output, 'HEAD is now at') !== false || strpos($git_output, 'Already up to date') !== false) {
+        $_SESSION['git_output'] = $git_output;
+        header("Location: system_update.php?updated=true");
+    } else {
+        $_SESSION['git_error'] = $git_output;
+        header("Location: system_update.php?error=true");
+    }
     exit;
 }
 
@@ -86,13 +100,25 @@ $settings = getSettings($pdo);
         <?php if (isset($_GET['updated'])): ?>
             <script>
                 Swal.fire({
-                    title: 'Update Selesai!',
-                    text: 'Kode berhasil diperbarui dari Git.',
+                    title: 'Update Berhasil!',
+                    text: 'Kode sistem telah diperbarui ke versi terbaru.',
                     icon: 'success',
-                    footer: '<pre class="text-left text-[10px] bg-slate-100 p-2 rounded w-full max-h-40 overflow-auto"><?php echo addslashes($_SESSION['git_output'] ?? ""); ?></pre>'
+                    footer: '<div class="w-full text-left"><p class="text-xs font-bold mb-1">Terminal Output:</p><pre class="text-[10px] bg-slate-900 text-slate-300 p-3 rounded-lg w-full max-h-40 overflow-auto">' + `<?php echo addslashes($_SESSION['git_output'] ?? ""); ?>` + '</pre></div>'
                 });
             </script>
             <?php unset($_SESSION['git_output']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <script>
+                Swal.fire({
+                    title: 'Update Gagal!',
+                    text: 'Terjadi kesalahan saat melakukan update dari Git.',
+                    icon: 'error',
+                    footer: '<div class="w-full text-left"><p class="text-xs font-bold mb-1 text-red-600">Error Output:</p><pre class="text-[10px] bg-red-50 text-red-800 p-3 rounded-lg border border-red-100 w-full max-h-40 overflow-auto">' + `<?php echo addslashes($_SESSION['git_error'] ?? ""); ?>` + '</pre></div>'
+                });
+            </script>
+            <?php unset($_SESSION['git_error']); ?>
         <?php endif; ?>
 
         <?php if ($db_message): ?>
