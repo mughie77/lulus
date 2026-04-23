@@ -95,6 +95,18 @@ elseif ($action === 'delete') {
     echo json_encode(['status' => 'success']);
 }
 
+elseif ($action === 'delete_selected') {
+    $ids = $_POST['ids'] ?? [];
+    if (!empty($ids)) {
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("DELETE FROM siswa WHERE id IN ($placeholders)");
+        $stmt->execute($ids);
+        echo json_encode(['status' => 'success']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Tidak ada data yang dipilih.']);
+    }
+}
+
 elseif ($action === 'import') {
     if (isset($_FILES['file_excel']) && $_FILES['file_excel']['error'] === UPLOAD_ERR_OK) {
         if ($xlsx = SimpleXLSX::parse($_FILES['file_excel']['tmp_name'])) {

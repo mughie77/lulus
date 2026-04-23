@@ -21,12 +21,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="ms-3">Pengaturan</span>
                 </a>
             </li>
-            <li>
-                <a href="system_update.php" class="flex items-center p-3 rounded-xl hover:bg-indigo-800 transition-all <?php echo $current_page == 'system_update.php' ? 'bg-indigo-700' : ''; ?>">
-                    <i class="fas fa-sync w-6"></i>
-                    <span class="ms-3">System Update</span>
-                </a>
-            </li>
             <li class="pt-10">
                 <a href="logout.php" class="flex items-center p-3 rounded-xl text-red-300 hover:bg-red-900 hover:text-white transition-all">
                     <i class="fas fa-sign-out-alt w-6"></i>

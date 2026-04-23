@@ -29,6 +29,9 @@ $settings = getSettings($pdo);
                     <input type="text" id="adminSearch" placeholder="Cari Nama/NISN..." class="bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-64 shadow-sm">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                 </div>
+                <button id="btnBulkDelete" onclick="deleteSelected()" class="hidden bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white px-6 py-3 rounded-2xl transition-all font-bold flex items-center border border-rose-200">
+                    <i class="fas fa-trash-alt mr-2"></i> Hapus Terpilih
+                </button>
                 <button onclick="openModal('add')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl shadow-lg shadow-indigo-200 transition-all font-bold flex items-center">
                     <i class="fas fa-plus mr-2"></i> Tambah Siswa
                 </button>
@@ -56,6 +59,9 @@ $settings = getSettings($pdo);
                 <table class="min-w-full divide-y divide-slate-100">
                     <thead class="bg-slate-50/50">
                         <tr>
+                            <th class="px-8 py-5 text-left">
+                                <input type="checkbox" id="selectAll" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            </th>
                             <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">No</th>
                             <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">NISN</th>
                             <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">Nama</th>
@@ -147,14 +153,20 @@ $settings = getSettings($pdo);
             const data = result.data;
 
             tbody.innerHTML = '';
+            document.getElementById('selectAll').checked = false;
+            toggleBulkDeleteBtn();
+
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-8 py-10 text-center text-slate-400 font-medium italic">Tidak ada data ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-8 py-10 text-center text-slate-400 font-medium italic">Tidak ada data ditemukan.</td></tr>`;
             }
 
             data.forEach((s, i) => {
                 const globalIndex = (currentPage - 1) * currentLimit + i + 1;
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-8 py-5">
+                            <input type="checkbox" class="student-checkbox w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" value="${s.id}" onchange="toggleBulkDeleteBtn()">
+                        </td>
                         <td class="px-8 py-5 text-sm font-medium text-slate-400">${globalIndex}</td>
                         <td class="px-8 py-5 text-sm font-bold text-slate-900">${s.nisn}</td>
                         <td class="px-8 py-5 text-sm font-semibold text-slate-700">${s.nama}</td>
@@ -232,6 +244,54 @@ $settings = getSettings($pdo);
             currentPage = 1;
             fetchStudents();
         });
+
+        // Select All listener
+        document.getElementById('selectAll').addEventListener('change', (e) => {
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            checkboxes.forEach(cb => cb.checked = e.target.checked);
+            toggleBulkDeleteBtn();
+        });
+
+        function toggleBulkDeleteBtn() {
+            const selected = document.querySelectorAll('.student-checkbox:checked').length;
+            const btn = document.getElementById('btnBulkDelete');
+            if (selected > 0) {
+                btn.classList.remove('hidden');
+                btn.innerHTML = `<i class="fas fa-trash-alt mr-2"></i> Hapus (${selected})`;
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        async function deleteSelected() {
+            const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+            const ids = Array.from(checkboxes).map(cb => cb.value);
+
+            const confirm = await Swal.fire({
+                title: 'Hapus data terpilih?',
+                text: `${ids.length} data siswa akan dihapus permanen!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus Semua!'
+            });
+
+            if (confirm.isConfirmed) {
+                const formData = new FormData();
+                ids.forEach(id => formData.append('ids[]', id));
+
+                const res = await fetch('proses.php?action=delete_selected', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.status === 'success') {
+                    Swal.fire('Terhapus!', 'Data terpilih berhasil dihapus.', 'success');
+                    fetchStudents();
+                }
+            }
+        }
 
         function openModal(mode) {
             currentMode = mode;
