@@ -7,13 +7,13 @@ $git_url = "https://github.com/mughie77/lulus.git";
 if (isset($_POST['update'])) {
     // Check if git is initialized
     if (!is_dir('../.git')) {
-        $cmd = "cd .. && git init && git remote add origin $git_url && git fetch --all && git reset --hard origin/master 2>&1";
+        $cmd = "cd .. && git init && git remote add origin $git_url && git fetch --all && (git reset --hard origin/main || git reset --hard origin/master) 2>&1";
     } else {
-        $cmd = "cd .. && git fetch --all && git reset --hard origin/master 2>&1";
+        $cmd = "cd .. && git remote set-url origin $git_url && git fetch --all && (git reset --hard origin/main || git reset --hard origin/master) 2>&1";
     }
-    $output = shell_exec($cmd);
+    $git_output = shell_exec($cmd);
+    $_SESSION['git_output'] = $git_output;
 
-    // After code update, we should also trigger DB sync
     header("Location: system_update.php?updated=true");
     exit;
 }
@@ -85,8 +85,14 @@ $settings = getSettings($pdo);
 
         <?php if (isset($_GET['updated'])): ?>
             <script>
-                Swal.fire('Update Selesai!', 'Kode berhasil diperbarui dari Git.', 'success');
+                Swal.fire({
+                    title: 'Update Selesai!',
+                    text: 'Kode berhasil diperbarui dari Git.',
+                    icon: 'success',
+                    footer: '<pre class="text-left text-[10px] bg-slate-100 p-2 rounded w-full max-h-40 overflow-auto"><?php echo addslashes($_SESSION['git_output'] ?? ""); ?></pre>'
+                });
             </script>
+            <?php unset($_SESSION['git_output']); ?>
         <?php endif; ?>
 
         <?php if ($db_message): ?>
