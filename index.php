@@ -274,14 +274,14 @@ $waktu_buka = $settings['tgl_pengumuman'];
                 if (result.status === 'success') {
                     const s = result.data;
                     const found_by = result.found_by;
+                    const cleanLink = s.link_skl.trim().replace(/[\n\r\t]/g, '');
 
                     document.getElementById('studentName').innerText = s.nama;
                     document.getElementById('studentNisn').innerText = `NISN: ${s.nisn}`;
 
                     const badge = document.getElementById('statusBadge');
                     const iconDiv = document.getElementById('statusIcon');
-                    const downloadBtn = document.getElementById('downloadBtn');
-                    const restriction = document.getElementById('downloadRestriction');
+                    const downloadArea = document.getElementById('downloadArea');
                     const resultCard = document.getElementById('resultCard');
 
                     if (s.status === 'LULUS') {
@@ -290,19 +290,26 @@ $waktu_buka = $settings['tgl_pengumuman'];
                         iconDiv.innerHTML = '<div class="w-20 h-20 md:w-24 md:h-24 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-4xl md:text-5xl shadow-xl shadow-emerald-200 animate-bounce"><i class="fas fa-check"></i></div>';
 
                         if (found_by === 'nisn') {
-                            downloadBtn.classList.remove('hidden');
-                            downloadBtn.setAttribute('href', s.link_skl.trim());
-                            restriction.classList.add('hidden');
+                            downloadArea.innerHTML = `
+                                <a href="${cleanLink}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center space-x-3 w-full max-w-sm mx-auto bg-slate-900 hover:bg-indigo-600 text-white font-black py-4 md:py-5 rounded-2xl md:rounded-[2rem] transition-all duration-300 shadow-2xl hover:-translate-y-1">
+                                    <i class="fas fa-file-pdf text-xl"></i>
+                                    <span>DOWNLOAD SKL (PDF)</span>
+                                </a>
+                            `;
                         } else {
-                            downloadBtn.classList.add('hidden');
-                            restriction.classList.remove('hidden');
+                            downloadArea.innerHTML = `
+                                <div class="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+                                    <p class="text-amber-700 text-xs md:text-sm font-bold italic">
+                                        <i class="fas fa-info-circle mr-1"></i> Untuk mengunduh SKL, silakan cari menggunakan NISN.
+                                    </p>
+                                </div>
+                            `;
                         }
                     } else {
                         badge.innerText = 'TIDAK LULUS';
                         badge.className = 'inline-block px-8 py-3 md:px-12 md:py-4 rounded-2xl md:rounded-3xl text-xl md:text-2xl font-black mb-8 md:mb-10 bg-rose-100 text-rose-700 shadow-rose-100';
                         iconDiv.innerHTML = '<div class="w-20 h-20 md:w-24 md:h-24 bg-rose-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-4xl md:text-5xl shadow-xl shadow-rose-200"><i class="fas fa-times"></i></div>';
-                        downloadBtn.classList.add('hidden');
-                        restriction.classList.add('hidden');
+                        downloadArea.innerHTML = '';
                     }
 
                     resultCard.classList.remove('hidden');

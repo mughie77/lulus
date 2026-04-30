@@ -169,7 +169,7 @@ $settings = getSettings($pdo);
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-50/50 transition-colors";
 
-                // Construct cells manually for better security and reliability
+                const cleanLink = s.link_skl.trim().replace(/[\n\r\t]/g, '');
                 row.innerHTML = `
                         <td class="px-8 py-5">
                             <input type="checkbox" class="student-checkbox w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" value="${s.id}" onchange="toggleBulkDeleteBtn()">
@@ -183,7 +183,7 @@ $settings = getSettings($pdo);
                             </span>
                         </td>
                         <td class="px-8 py-5 text-sm">
-                            <a href="#" target="_blank" class="student-link text-indigo-600 hover:text-indigo-900 font-bold flex items-center" rel="noopener noreferrer">
+                            <a href="${cleanLink}" target="_blank" class="text-indigo-600 hover:text-indigo-900 font-bold flex items-center" rel="noopener noreferrer">
                                 <i class="fas fa-external-link-alt mr-2"></i> Link
                             </a>
                         </td>
@@ -192,10 +192,6 @@ $settings = getSettings($pdo);
                             <button onclick="deleteStudent(${s.id})" class="text-slate-400 hover:text-red-600 p-2 transition-colors"><i class="fas fa-trash"></i></button>
                         </td>
                 `;
-
-                // Set the link explicitly to avoid attribute breaking
-                const linkElem = row.querySelector('.student-link');
-                linkElem.href = s.link_skl.trim();
 
                 tbody.appendChild(row);
             });
