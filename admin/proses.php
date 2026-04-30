@@ -46,14 +46,14 @@ if ($action === 'fetch') {
 }
 
 elseif ($action === 'add') {
-    $nisn = $_POST['nisn'];
-    $nama = $_POST['nama'];
-    $link_skl = $_POST['link_skl'];
+    $nisn = trim($_POST['nisn']);
+    $nama = trim($_POST['nama']);
+    $link_skl = trim($_POST['link_skl']);
     $status = $_POST['status'];
 
     // Validation for Google Drive or PDF
     if (!filter_var($link_skl, FILTER_VALIDATE_URL) ||
-        !(strpos($link_skl, 'drive.google.com') !== false || strtolower(pathinfo($link_skl, PATHINFO_EXTENSION)) === 'pdf')) {
+        !(strpos($link_skl, 'drive.google.com') !== false || strpos(strtolower($link_skl), '.pdf') !== false)) {
         echo json_encode(['status' => 'error', 'message' => 'Link SKL harus berupa link Google Drive atau file PDF.']);
         exit;
     }
@@ -69,14 +69,14 @@ elseif ($action === 'add') {
 
 elseif ($action === 'update') {
     $id = $_POST['id'];
-    $nisn = $_POST['nisn'];
-    $nama = $_POST['nama'];
-    $link_skl = $_POST['link_skl'];
+    $nisn = trim($_POST['nisn']);
+    $nama = trim($_POST['nama']);
+    $link_skl = trim($_POST['link_skl']);
     $status = $_POST['status'];
 
     // Validation for Google Drive or PDF
     if (!filter_var($link_skl, FILTER_VALIDATE_URL) ||
-        !(strpos($link_skl, 'drive.google.com') !== false || strtolower(pathinfo($link_skl, PATHINFO_EXTENSION)) === 'pdf')) {
+        !(strpos($link_skl, 'drive.google.com') !== false || strpos(strtolower($link_skl), '.pdf') !== false)) {
         echo json_encode(['status' => 'error', 'message' => 'Link SKL harus berupa link Google Drive atau file PDF.']);
         exit;
     }
@@ -130,7 +130,12 @@ elseif ($action === 'import') {
                 $stmt = $pdo->prepare("INSERT INTO siswa (nisn, nama, link_skl, status) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE nama = VALUES(nama), link_skl = VALUES(link_skl), status = VALUES(status)");
                 foreach ($rows as $row) {
                     if (count($row) >= 4) {
-                        $stmt->execute([$row[0], $row[1], $row[2], $row[3]]);
+                        $stmt->execute([
+                            trim($row[0]),
+                            trim($row[1]),
+                            trim($row[2]),
+                            trim($row[3])
+                        ]);
                     }
                 }
                 $pdo->commit();
