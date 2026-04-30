@@ -51,11 +51,8 @@ elseif ($action === 'add') {
     $link_skl = trim($_POST['link_skl']);
     $status = $_POST['status'];
 
-    // Validation for Google Drive or PDF
-    if (!filter_var($link_skl, FILTER_VALIDATE_URL) ||
-        !(strpos($link_skl, 'drive.google.com') !== false || strpos(strtolower($link_skl), '.pdf') !== false)) {
-        echo json_encode(['status' => 'error', 'message' => 'Link SKL harus berupa link Google Drive atau file PDF.']);
-        exit;
+    if (!empty($link_skl) && strpos($link_skl, 'http') !== 0) {
+        $link_skl = 'https://' . $link_skl;
     }
 
     try {
@@ -74,11 +71,8 @@ elseif ($action === 'update') {
     $link_skl = trim($_POST['link_skl']);
     $status = $_POST['status'];
 
-    // Validation for Google Drive or PDF
-    if (!filter_var($link_skl, FILTER_VALIDATE_URL) ||
-        !(strpos($link_skl, 'drive.google.com') !== false || strpos(strtolower($link_skl), '.pdf') !== false)) {
-        echo json_encode(['status' => 'error', 'message' => 'Link SKL harus berupa link Google Drive atau file PDF.']);
-        exit;
+    if (!empty($link_skl) && strpos($link_skl, 'http') !== 0) {
+        $link_skl = 'https://' . $link_skl;
     }
 
     try {
@@ -130,12 +124,18 @@ elseif ($action === 'import') {
                 $stmt = $pdo->prepare("INSERT INTO siswa (nisn, nama, link_skl, status) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE nama = VALUES(nama), link_skl = VALUES(link_skl), status = VALUES(status)");
                 foreach ($rows as $row) {
                     if (count($row) >= 4) {
-                        $stmt->execute([
-                            trim($row[0]),
-                            trim($row[1]),
-                            trim($row[2]),
-                            trim($row[3])
-                        ]);
+                        $nisn = trim($row[0]);
+                        $nama = trim($row[1]);
+                        $link = trim($row[2]);
+                        $status = strtoupper(trim($row[3]));
+
+                        if (!empty($link) && strpos($link, 'http') !== 0) {
+                            $link = 'https://' . $link;
+                        }
+
+                        if (!empty($nisn) && !empty($nama)) {
+                            $stmt->execute([$nisn, $nama, $link, $status]);
+                        }
                     }
                 }
                 $pdo->commit();
