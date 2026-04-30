@@ -291,7 +291,7 @@ $waktu_buka = $settings['tgl_pengumuman'];
 
                         if (found_by === 'nisn') {
                             downloadBtn.classList.remove('hidden');
-                            downloadBtn.href = s.link_skl;
+                            downloadBtn.setAttribute('href', s.link_skl.trim());
                             restriction.classList.add('hidden');
                         } else {
                             downloadBtn.classList.add('hidden');

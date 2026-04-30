@@ -163,10 +163,14 @@ $settings = getSettings($pdo);
                 tbody.innerHTML = `<tr><td colspan="7" class="px-8 py-10 text-center text-slate-400 font-medium italic">Tidak ada data ditemukan.</td></tr>`;
             }
 
+            window.currentStudentData = data; // Store globally for edit access
             data.forEach((s, i) => {
                 const globalIndex = (currentPage - 1) * currentLimit + i + 1;
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition-colors">
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/50 transition-colors";
+
+                // Construct cells manually for better security and reliability
+                row.innerHTML = `
                         <td class="px-8 py-5">
                             <input type="checkbox" class="student-checkbox w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" value="${s.id}" onchange="toggleBulkDeleteBtn()">
                         </td>
@@ -179,16 +183,21 @@ $settings = getSettings($pdo);
                             </span>
                         </td>
                         <td class="px-8 py-5 text-sm">
-                            <a href="${s.link_skl}" target="_blank" class="text-indigo-600 hover:text-indigo-900 font-bold flex items-center">
+                            <a href="#" target="_blank" class="student-link text-indigo-600 hover:text-indigo-900 font-bold flex items-center" rel="noopener noreferrer">
                                 <i class="fas fa-external-link-alt mr-2"></i> Link
                             </a>
                         </td>
                         <td class="px-8 py-5 text-sm text-center">
-                            <button onclick='editStudent(${JSON.stringify(s)})' class="text-slate-400 hover:text-indigo-600 p-2 transition-colors"><i class="fas fa-edit"></i></button>
+                            <button onclick="editStudent(${i})" class="text-slate-400 hover:text-indigo-600 p-2 transition-colors"><i class="fas fa-edit"></i></button>
                             <button onclick="deleteStudent(${s.id})" class="text-slate-400 hover:text-red-600 p-2 transition-colors"><i class="fas fa-trash"></i></button>
                         </td>
-                    </tr>
                 `;
+
+                // Set the link explicitly to avoid attribute breaking
+                const linkElem = row.querySelector('.student-link');
+                linkElem.href = s.link_skl.trim();
+
+                tbody.appendChild(row);
             });
 
             // Update Pagination UI
@@ -312,7 +321,8 @@ $settings = getSettings($pdo);
             document.getElementById(id).classList.add('hidden');
         }
 
-        function editStudent(s) {
+        function editStudent(index) {
+            const s = window.currentStudentData[index];
             currentMode = 'edit';
             document.getElementById('modalTitle').innerText = 'Edit Siswa';
             document.getElementById('studentId').value = s.id;
